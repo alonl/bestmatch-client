@@ -40,6 +40,12 @@
             android:noHistory="true"
             android:screenOrientation="portrait" >
         </activity>
+        
+        <activity
+            android:name="com.bestmatch.activities.Details"
+            android:noHistory="true"
+            android:screenOrientation="portrait" >
+        </activity>
 
 
     </application>

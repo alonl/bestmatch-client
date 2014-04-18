@@ -24,17 +24,21 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.LayoutParams;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bestmatch.R;
 import com.bestmatch.adapters.ResultsAdapter;
 import com.bestmatch.helpers.Data;
+import com.bestmatch.helpers.ImageHelper;
 import com.bestmatch.helpers.Match;
 import com.bestmatch.helpers.PostLoginData;
 import com.bestmatch.helpers.User;
@@ -65,30 +69,6 @@ public class MyResults extends FragmentActivity {
 		results = new ArrayList<Match>();
 		name = (TextView) findViewById(R.id.name);
 		pager = (ViewPager) findViewById(R.id.myviewpager);
-		pager.setOnPageChangeListener(new OnPageChangeListener() {
-			
-			@Override
-			public void onPageSelected(int arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onPageScrolled(int position, float arg1, int arg2) {
-				if (results.get(position).getUser1().getUid().equals(Data.currentUserID)) {
-					name.setText(results.get(position).getUser2().getName());	
-				} else {
-					name.setText(results.get(position).getUser1().getName());
-				}
-				
-			}
-			
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
 
 		ImageButton mainBtn = (ImageButton) findViewById(R.id.mainButton);
 		mainBtn.setOnClickListener(new OnClickListener() {
@@ -96,6 +76,7 @@ public class MyResults extends FragmentActivity {
 			@Override
 			public void onClick(View v) {
 				Intent myIntent = new Intent(MyResults.this, MainActivity.class);
+				myIntent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
 				MyResults.this.startActivity(myIntent);
 				MyResults.this.overridePendingTransition(0, 0);
 			}
@@ -105,6 +86,7 @@ public class MyResults extends FragmentActivity {
 			getMatches(5);
 		} else {
 			results = Data.ResultsData;
+			showMyPic();
 			showResults();
 		}
 	}
@@ -253,6 +235,7 @@ public class MyResults extends FragmentActivity {
 					results.get(matchesIndex).getUser1().setProfilePic(user1Image);
 					results.get(matchesIndex).getUser2().setProfilePic(user2Image);
 				}
+				Data.myPic = loadImageForUser(Data.currentUserID);
 				return null;
 
 			}
@@ -265,6 +248,7 @@ public class MyResults extends FragmentActivity {
 				if (pd != null) {
 					pd.dismiss();
 				}
+				showMyPic();
 				Data.ResultsData = results;
 				showResults();
 			}
@@ -274,6 +258,22 @@ public class MyResults extends FragmentActivity {
 
 	}
 
+	private void showMyPic() {
+		LinearLayout parent = (LinearLayout)findViewById(R.id.mainContainer);
+		int w = parent.getMeasuredHeight();
+		if (w <= 0) {
+			w = Data.widthRsultBackUp;
+		} else {
+			Data.widthRsultBackUp = w;
+		}
+		int size = (int)(w * 0.25);
+		
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(size, size);
+		ImageView myp = (ImageView)findViewById(R.id.myPic);
+		myp.setLayoutParams(params);
+		myp.setImageBitmap(ImageHelper.getRoundedCornerBitmap(Data.myPic , size));
+	}
+	
 	private Bitmap loadImageForUser(String uid) {
 		Bitmap resultImg = null;
 		try {
@@ -296,7 +296,7 @@ public class MyResults extends FragmentActivity {
 		} else {
 			name.setText(results.get(FIRST_PAGE).getUser1().getName());
 		}
-		adapter = new ResultsAdapter(this, this.getSupportFragmentManager(), results);
+		adapter = new ResultsAdapter(this, this.getSupportFragmentManager(), results, name);
 		pager.setAdapter(adapter);
 		pager.setOnPageChangeListener(adapter);
 

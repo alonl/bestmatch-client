@@ -8,10 +8,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.widget.TextView;
 
 import com.bestmatch.R;
 import com.bestmatch.activities.MyResults;
 import com.bestmatch.fragments.ResultImageFragment;
+import com.bestmatch.helpers.Data;
 import com.bestmatch.helpers.Match;
 import com.bestmatch.viewelements.MatchImage;
 
@@ -23,13 +25,15 @@ public class ResultsAdapter extends FragmentPagerAdapter implements
 	private MyResults context;
 	private FragmentManager fm;
 	private float scale;
+	private TextView name;
 	private ArrayList<Match> data = null;
 
-	public ResultsAdapter(MyResults context, FragmentManager fm, ArrayList<Match> data) {
+	public ResultsAdapter(MyResults context, FragmentManager fm, ArrayList<Match> data, TextView name) {
 		super(fm);
 		this.fm = fm;
 		this.context = context;
 		this.data = data;
+		this.name = name;
 	}
 
 	@Override
@@ -59,6 +63,13 @@ public class ResultsAdapter extends FragmentPagerAdapter implements
 	{	
 		if (positionOffset >= 0f && positionOffset <= 1f)
 		{
+			int pos = position % MyResults.PAGES;  
+			if (data.get(pos).getUser1().getUid().equals(Data.currentUserID)) {
+				name.setText(data.get(pos).getUser2().getName());	
+			} else {
+				name.setText(data.get(pos).getUser1().getName());
+			}
+			
 			cur = getRootView(position);
 			next = getRootView(position +1);
 

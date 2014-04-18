@@ -32,7 +32,6 @@
 			    	android:layout_centerHorizontal="true"
 			    	android:layout_alignBottom="@id/myviewpager"
 			    	android:id="@+id/name"
-			    	android:text="DIDIDIDI"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#ffffff"
@@ -47,7 +46,8 @@
 			<ImageView 
 			    android:id="@+id/myPic"
 			    android:layout_width="wrap_content"
-			    android:layout_height="wrap_content"/>
+			    android:layout_height="wrap_content"
+			    android:scaleType="fitXY"/>
 		    
 		</LinearLayout>
     </LinearLayout >

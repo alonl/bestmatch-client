@@ -35,7 +35,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -77,6 +76,7 @@ public class MainActivity extends FragmentActivity {
 	public ViewPager bottomPageViewer = null;
 
 	public ImageView yes = null;
+	public ImageView no = null;
 	public View whiteLine = null;
 	public LinearLayout textContainer = null;
 
@@ -110,6 +110,7 @@ public class MainActivity extends FragmentActivity {
 		bottomPageViewer = (ViewPager) findViewById(R.id.bottomViewer);
 
 		yes = (ImageView) findViewById(R.id.yes);
+		no = (ImageView) findViewById(R.id.no);
 		textContainer = (LinearLayout) findViewById(R.id.textContainer);
 		SGD = new ScaleGestureDetector(this, new ScaleListener());
 
@@ -391,9 +392,13 @@ public class MainActivity extends FragmentActivity {
 			RelativeLayout container = (RelativeLayout) findViewById(R.id.container);
 			container.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
-			LayoutParams matchParams = new LayoutParams(imageHeight / 2, imageHeight / 2);
+			LayoutParams matchParams = new LayoutParams((int)(imageHeight * 0.75), (int)(imageHeight * 0.75));
 			matchParams.addRule(RelativeLayout.CENTER_IN_PARENT);
 			yes.setLayoutParams(matchParams);
+			
+			LayoutParams nextParams = new LayoutParams((int)(imageHeight * 1.1), (int)(imageHeight * 1.1));
+			nextParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+			no.setLayoutParams(nextParams);
 
 			LinearLayout greenStrip = (LinearLayout) findViewById(R.id.greenStrip);
 			LayoutParams greenStripParams = new LayoutParams(LayoutParams.MATCH_PARENT, (int) (screenHeight * 0.273));
@@ -440,13 +445,14 @@ public class MainActivity extends FragmentActivity {
 				ValueAnimator showPinkBottom = ObjectAnimator.ofFloat(bottom.getChildAt(2), "alpha", 0, 1f);
 
 				AnimatorSet moveMatch = new AnimatorSet();
-				moveMatch.setDuration(450);
+				moveMatch.setDuration(410);
 				// match.setInterpolator(interpolator);
 				moveMatch.play(topGoDown).with(bootompGoUp).with(showPinkBottom).with(showPinkTop);
 
 				ValueAnimator fadeOutText = ObjectAnimator.ofFloat(textContainer, "alpha", 1f, 0f);
+				fadeOutText.setDuration(100);
 				ValueAnimator fadeinMatch = ObjectAnimator.ofFloat(yes, "alpha", 0f, 1f);
-				fadeinMatch.setDuration(10);
+				fadeinMatch.setDuration(1);
 				fadeinMatch.addListener(new AnimatorListener() {
 
 					@Override
@@ -459,6 +465,9 @@ public class MainActivity extends FragmentActivity {
 
 					@Override
 					public void onAnimationEnd(Animator animation) {
+						topPageViewer.setAlpha(0);
+						bottomPageViewer.setAlpha(0);
+						
 						AnimationDrawable a = (AnimationDrawable) yes.getDrawable();
 						a.stop();
 						a.start();
@@ -487,29 +496,28 @@ public class MainActivity extends FragmentActivity {
 						});
 
 						ValueAnimator topGoUp = ObjectAnimator.ofFloat(top, "translationY", (imageHeight * 0.725f), 0);
-						ValueAnimator bootompGoDown = ObjectAnimator.ofFloat(bottom, "translationY",
-								-(imageHeight * 0.725f), 0);
+						ValueAnimator bootompGoDown = ObjectAnimator.ofFloat(bottom, "translationY", -(imageHeight * 0.725f), 0);
+						ValueAnimator showUp = ObjectAnimator.ofFloat(topPageViewer, "alpha", 0, 1);
+						ValueAnimator showDown = ObjectAnimator.ofFloat(bottomPageViewer, "alpha", 0, 1);
 						ValueAnimator hidePinkTop = ObjectAnimator.ofFloat(top.getChildAt(2), "alpha", 0.6f, 0);
 						ValueAnimator hidePinkBottom = ObjectAnimator.ofFloat(bottom.getChildAt(2), "alpha", 1, 0);
 
 						int next = (topPageViewer.getCurrentItem() + 1) % PAGES;
-						topPageViewer.setAlpha(0);
-						bottomPageViewer.setAlpha(0);
+						
+						
 						topPageViewer.setCurrentItem(next);
 						bottomPageViewer.setCurrentItem(next);
 						TextView text1 = (TextView) textContainer.getChildAt(0);
 						TextView text2 = (TextView) textContainer.getChildAt(2);
 						text1.setText(matches.get(next).getUser1().getName());
 						text2.setText(matches.get(next).getUser2().getName());
-						topPageViewer.setAlpha(1);
-						bottomPageViewer.setAlpha(1);
 
 						AnimatorSet goBack = new AnimatorSet();
-						goBack.setDuration(450);
-						goBack.play(topGoUp).with(bootompGoDown).with(hidePinkTop).with(hidePinkBottom);
+						goBack.setDuration(410);
+						goBack.play(topGoUp).with(bootompGoDown).with(hidePinkTop).with(hidePinkBottom).with(showUp).with(showDown);
 
 						AnimatorSet animationSet = new AnimatorSet();
-						animationSet.setStartDelay(600);
+						animationSet.setStartDelay(770);
 						animationSet.play(fadeOutMatch).before(goBack).before(fadeInText);
 						animationSet.start();
 
@@ -543,7 +551,7 @@ public class MainActivity extends FragmentActivity {
 				moveMatch.play(topGoUp).with(bootompGoDown).with(showBlueTop).with(showBlueBottom).with(fadeOutText)
 						.with(topHide).with(bootomHide);
 
-				ValueAnimator fadeinMatch = ObjectAnimator.ofFloat(yes, "alpha", 0f, 1f);
+				ValueAnimator fadeinMatch = ObjectAnimator.ofFloat(no, "alpha", 0f, 1f);
 				fadeinMatch.addListener(new AnimatorListener() {
 
 					@Override
@@ -566,8 +574,9 @@ public class MainActivity extends FragmentActivity {
 						TextView text2 = (TextView) textContainer.getChildAt(2);
 						text1.setText(matches.get(next).getUser1().getName());
 						text2.setText(matches.get(next).getUser2().getName());
-						topPageViewer.setAlpha(1);
-						bottomPageViewer.setAlpha(1);
+						
+
+				
 						
 						ValueAnimator topGoBack = ObjectAnimator.ofFloat(top, "translationY", -(imageHeight), 0);
 						ValueAnimator bootompGoBack = ObjectAnimator.ofFloat(bottom, "translationY", (imageHeight), 0);
@@ -579,10 +588,12 @@ public class MainActivity extends FragmentActivity {
 						reset.play(topGoBack).with(bootompGoBack).with(hideBlueTop).with(hideBlueBottom);
 						reset.setDuration(10);
 
-						ValueAnimator fadeOutMatch = ObjectAnimator.ofFloat(yes, "alpha", 1f, 0f);
+						ValueAnimator fadeOutMatch = ObjectAnimator.ofFloat(no, "alpha", 1f, 0f);
 						ValueAnimator fadeInText = ObjectAnimator.ofFloat(textContainer, "alpha", 0f, 1f);
 						ValueAnimator topShow = ObjectAnimator.ofFloat(top, "alpha", 0, 1);
 						ValueAnimator bootompShow = ObjectAnimator.ofFloat(bottom, "alpha", 0, 1);
+						ValueAnimator showTopPager = ObjectAnimator.ofFloat(topPageViewer, "alpha", 0, 1);
+						ValueAnimator showBottomPager = ObjectAnimator.ofFloat(bottomPageViewer, "alpha", 0, 1);
 						bootompShow.addListener(new AnimatorListener() {
 
 							@Override
@@ -604,8 +615,9 @@ public class MainActivity extends FragmentActivity {
 						});
 
 						AnimatorSet show = new AnimatorSet();
-						show.play(reset).before(fadeInText).with(topShow).with(bootompShow).with(fadeOutMatch);
-						show.setDuration(250);
+						show.play(reset).before(fadeInText).with(topShow).with(bootompShow).with(fadeOutMatch).with(showTopPager).with(showBottomPager);
+						show.setStartDelay(605);
+						show.setDuration(350);
 						show.start();
 
 					}
@@ -615,11 +627,14 @@ public class MainActivity extends FragmentActivity {
 					}
 				});
 
-				fadeinMatch.setDuration(10);
-
 				AnimatorSet animatorSet = new AnimatorSet();
-				animatorSet.play(moveMatch).before(fadeinMatch);
+				animatorSet.play(moveMatch).with(fadeinMatch);
 				animatorSet.start();
+				AnimationDrawable a = (AnimationDrawable) no.getDrawable();
+				a.stop();
+				a.start();
+				
+
 
 			}
 

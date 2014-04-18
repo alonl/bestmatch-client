@@ -130,6 +130,14 @@
                 android:layout_centerInParent="true"
                 android:src="@drawable/match_animation"
                 android:alpha="0" />
+            
+			<ImageView
+                android:id="@+id/no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/next_animation"
+                android:alpha="0" />
         </RelativeLayout>
     </RelativeLayout>
 
